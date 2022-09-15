@@ -1,4 +1,5 @@
 import { ApolloClient, InMemoryCache, gql } from "@apollo/client";
+import { SimpleCache } from "./SimpleCache";
 
 const isServer = typeof window === "undefined";
 // @ts-ignore
@@ -11,7 +12,7 @@ export function getApolloClient(forceNew?: boolean) {
     CLIENT = new ApolloClient({
       ssrMode: isServer,
       uri: "https://api.graphql.jobs/",
-      cache: new InMemoryCache().restore(windowApolloState || {}),
+      cache: new SimpleCache().restore(windowApolloState || {}),
     });
   }
 
