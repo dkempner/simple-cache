@@ -3,6 +3,7 @@ import {
   Cache,
   DataProxy,
   DocumentNode,
+  InMemoryCache,
   MissingFieldError,
   Reference,
   Transaction,
@@ -16,9 +17,12 @@ export class SimpleCache extends ApolloCache<SimpleCacheObject> {
   constructor() {
     super();
     this.cache = {};
+    this.imc = new InMemoryCache();
   }
 
   __type = "SimpleCache";
+
+  imc: InMemoryCache;
 
   read<TData = any, TVariables = any>(
     query: Cache.ReadOptions<TVariables, TData>
@@ -52,7 +56,9 @@ export class SimpleCache extends ApolloCache<SimpleCacheObject> {
 
     if (!queryCache) {
       return {
+        result: {} as T,
         complete: false,
+        missing: [new MissingFieldError("", {}, query.query, query.variables)],
       };
     }
 
@@ -65,7 +71,9 @@ export class SimpleCache extends ApolloCache<SimpleCacheObject> {
     }
 
     return {
+      result: {} as T,
       complete: false,
+      missing: [new MissingFieldError("", {}, query.query, query.variables)],
     };
   }
   watch<TData = any, TVariables = any>(
@@ -103,5 +111,8 @@ export class SimpleCache extends ApolloCache<SimpleCacheObject> {
     console.log({ fashionEvent: "performTransaction" });
     console.log({ transaction });
     transaction(this);
+  }
+  transformDocument(document: DocumentNode): DocumentNode {
+    return this.imc.transformDocument(document);
   }
 }
