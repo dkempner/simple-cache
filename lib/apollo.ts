@@ -1,5 +1,5 @@
 import { ApolloClient, InMemoryCache, gql } from "@apollo/client";
-import { SimpleCache } from "./SimpleCache";
+import { DocumentCache } from "./DocumentCache";
 
 const isServer = typeof window === "undefined";
 // @ts-ignore
@@ -12,26 +12,9 @@ export function getApolloClient(forceNew?: boolean) {
     CLIENT = new ApolloClient({
       ssrMode: isServer,
       uri: "https://api.graphql.jobs/",
-      cache: new SimpleCache().restore(windowApolloState || {}),
+      cache: new DocumentCache().restore(windowApolloState || {}),
     });
   }
 
   return CLIENT;
 }
-
-export type Job = {
-  __typename: string;
-  id: string;
-  title: string;
-  postedAt: Date;
-};
-
-export const QUERY = gql`
-  query Jobs {
-    jobs {
-      id
-      title
-      postedAt
-    }
-  }
-`;
