@@ -7,12 +7,15 @@ import {
   InMemoryCache,
   InMemoryCacheConfig,
   MissingFieldError,
+  NormalizedCacheObject,
   Reference,
   Transaction,
 } from "@apollo/client";
 import fastStringify from "fast-json-stable-stringify";
 import { equal } from "@wry/equality";
-import sha256 from "hash.js/lib/hash/sha/256";
+import { sha256 } from "hash.js";
+
+type CacheShape = DocumentCacheObject | NormalizedCacheObject;
 
 /**
  * QueryPlusVariablesMap[query][variables] = data
@@ -76,7 +79,7 @@ export class DocumentCache extends ApolloCache<DocumentCacheObject> {
 
   /** Uses fast-json-stable-stringify to ensure order of properties doesn't affect hashing */
   private makeVariablesCacheKey<TVariables>(variables: TVariables) {
-    return fastStringify(variables);
+    return fastStringify(variables || {});
   }
 
   private getCachedData<TData = any, TVariables = any>(
